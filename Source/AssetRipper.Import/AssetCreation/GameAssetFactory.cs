@@ -83,11 +83,11 @@ public sealed class GameAssetFactory : AssetFactoryBase
 					{
 						structure.Read(ref reader, monoBehaviour.Collection.Version, monoBehaviour.Collection.Flags);
 						monoBehaviour.Structure = structure;
-						Logger.Warning(LogCategory.Import, $"MonoBehaviour has a field with the [SerializeReference] attribute. The managed references data was skipped.");
+						Logger.Warning(LogCategory.Import, $"MonoBehaviour has one or more fields with the [SerializeReference] attribute. The managed references data was skipped.");
 					}
 					catch (Exception ex)
 					{
-						Logger.Error(LogCategory.Import, $"Unable to read MonoBehaviour with [SerializeReference] fields: {ex.GetType().Name}");
+						Logger.Error(LogCategory.Import, $"Unable to read MonoBehaviour with [SerializeReference] fields: {ex.GetType().Name}: {ex.Message}");
 						monoBehaviour.Structure = null;
 					}
 				}
