@@ -75,11 +75,21 @@ public sealed class GameAssetFactory : AssetFactoryBase
 			SerializableStructure? structure;
 			if (type is not null && TypeTreeNodeStruct.TryMakeFromTypeTree(type.OldType, out TypeTreeNodeStruct rootNode))
 			{
+				bool hasManagedReferences = rootNode.SubNodes.Count > 0 && rootNode.SubNodes[^1].IsManagedReferencesRegistry;
 				structure = SerializableTreeType.FromRootNode(rootNode, true).CreateSerializableStructure();
-				if (structure.Type.Fields.Count > 0 && structure.Type.Fields[^1] is { Type.Name: "ManagedReferencesRegistry", Name: "references" })
+				if (hasManagedReferences)
 				{
-					Logger.Error(LogCategory.Import, $"MonoBehaviour has a field with the [SerializeReference] attribute, which is not currently supported.");
-					monoBehaviour.Structure = null;
+					try
+					{
+						structure.Read(ref reader, monoBehaviour.Collection.Version, monoBehaviour.Collection.Flags);
+						monoBehaviour.Structure = structure;
+						Logger.Warning(LogCategory.Import, $"MonoBehaviour has a field with the [SerializeReference] attribute. The managed references data was skipped.");
+					}
+					catch (Exception ex)
+					{
+						Logger.Error(LogCategory.Import, $"Unable to read MonoBehaviour with [SerializeReference] fields: {ex.GetType().Name}");
+						monoBehaviour.Structure = null;
+					}
 				}
 				else if (structure.TryRead(ref reader, monoBehaviour))
 				{

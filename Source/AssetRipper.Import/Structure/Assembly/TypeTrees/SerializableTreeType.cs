@@ -28,6 +28,10 @@ public sealed class SerializableTreeType : SerializableType
 		int startIndex = monoBehaviourStructure ? FindStartingIndexForMonoBehaviour(rootNode) : 0;
 		for (int i = startIndex; i < rootNode.SubNodes.Count; i++)
 		{
+			if (rootNode.SubNodes[i].IsManagedReferencesRegistry)
+			{
+				continue;
+			}
 			AddNode(rootNode.SubNodes[i], fields);
 		}
 		serializableTreeType.Fields = fields;

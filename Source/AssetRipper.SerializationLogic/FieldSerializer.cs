@@ -200,8 +200,8 @@ public readonly partial struct FieldSerializer
 			{
 				if (fieldDefinition.HasSerializeReferenceAttribute())
 				{
-					failureReason = $"{fieldDefinition.DeclaringType?.FullName}.{fieldDefinition.Name} uses the [SerializeReference] attribute, which is currently not supported.";
-					return false;
+					// Skip fields with [SerializeReference] as managed reference deserialization is not fully supported.
+					continue;
 				}
 
 				int arrayDepth = 0;
